@@ -20,7 +20,7 @@
 //		  (first) and ’r’ (rest)
 // • "Print": terminates the program
 //---------------------------------------------------------------
-#include "EXPRESSIONUTILS.h"
+#include "FUNCTIONS.h"
 
 
 
@@ -40,39 +40,17 @@ Exp* test(){
 }
 
 int main(){
-
-
-
-	/*Test area starts            */
-	//All expression functions work currectly 
-
-
-	 // Exp* head = test();
-	 // printExpression(head);
-	 // printf("stopper\n");
-
-
-	/*Test area ends           */
-	
-
-	
-
-
-
-
-
-
-
-	///*
-
-	
-
-	Exp* head = createExpNode();
+	Exp* curr = createExpNode();
+	SymNode* table = createSymNode();
+	Var* currV = createVariable();
 	printf("%s\n","Insert command or type \"Exit\" to exit " );
 	char c = '0';//holds command
 	char* cStr = (char*)malloc(100*sizeof(char));//String for create
+	char* pStr = (char*)malloc(100*sizeof(char));//String for print
 	char* aStr = (char*)malloc(100*sizeof(char));//String for append
 	char* sStr = (char*)malloc(100*sizeof(char));//String for subset
+	char* vStr = (char*)malloc(100*sizeof(char));//String for variableName
+	char* eStr = (char*)malloc(100*sizeof(char));//String for expression and eval
 
 	//Exit terminates the program
 	while( c != 'q'){
@@ -80,49 +58,99 @@ int main(){
 
 		//Handles create
 		if(c == 'c'){
-			free(head);
+			free(curr);
+			cStr = (char*)malloc(100*sizeof(char));
 			fgets(cStr,100,stdin);
 			fgets(cStr,100,stdin);
 
 			if(cStr[strlen(cStr) -1] == 10){
 				cStr[strlen(cStr) -1] = 0;
 			}
-			head = createExp(cStr);
-			//free(expression);
+			currV = createE("foo",cStr,table);
+			//printf("stopper\n");
 		}
 
 		//Handles print
 		else if(c == 'p'){
-			printExpression(head);
-			
+			pStr = (char*)malloc(100*sizeof(char));
+			fgets(pStr,100,stdin);
+			fgets(pStr,100,stdin);
+
+			if(pStr[strlen(pStr) -1] == 10){
+				pStr[strlen(pStr) -1] = 0;
+			}
+
+
+			//create a new variable for find var here
+			//so curr would always be foo if need be
+			currV = findVar(table,pStr);
+			printExpression(getVarExp(currV));
 		}
 
 		//Handles Append
 		else if(c == 'a'){
+			aStr = (char*)malloc(100*sizeof(char));
 			fgets(aStr,100,stdin);
 			fgets(aStr,100,stdin);
 
 			if(aStr[strlen(aStr) -1] == 10){
 				aStr[strlen(aStr) -1] = 0;
 			}
-			appendExpression(head,aStr);
+
+			appendVar(currV, aStr);
+
+			//appendExpression(curr,aStr);
+
 			//free(appendStr);
 			//char x;
 		}
 
 		//Handles subset
 		else if(c == 's'){
+			sStr = (char*)malloc(100*sizeof(char));
 			fgets(sStr,100,stdin);
 			fgets(sStr,100,stdin);
-			printSubset(head,sStr);
+			printSubsetVF(currV,sStr);
 			//free(subset);
 		}
 		else if(c == 'e'){
-			evaluate(head);
+			eStr = (char*)malloc(100*sizeof(char));
+			fgets(eStr,100,stdin);
+			fgets(eStr,100,stdin);
+
+			if(eStr[strlen(eStr) -1] == 10){
+				eStr[strlen(eStr) -1] = 0;
+			}
+
+			printf("%ld\n", evalFunction(eStr,table));
+		}
+
+
+		//Handles defining variables and functions without parameters
+		else if(c == 'v' || c == 'd'){
+			vStr = (char*)malloc(100*sizeof(char));
+			eStr = (char*)malloc(100*sizeof(char));
+			fgets(vStr,100,stdin);
+			fgets(vStr,100,stdin);
+
+			fgets(eStr,100,stdin);
+			//fgets(eStr,100,stdin);
+
+			if(vStr[strlen(vStr) -1] == 10){
+				vStr[strlen(vStr) -1] = 0;
+			}
+
+			if(eStr[strlen(eStr) -1] == 10){
+				eStr[strlen(eStr) -1] = 0;
+			}
+			
+
+			//set make newV curr v to allow most recent v to be curr
+			Var* newV = createVarWExp(vStr,eStr);
+			addToSymTable(table,newV);
+			
 		}
 	}
-	//free(x);
 	return 0;	
-	//*/
 }
 
