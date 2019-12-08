@@ -40,8 +40,21 @@ Var* createE(char * name, char * expS, SymNode* table){
 long int evalFunction(char* eStr,SymNode* table){
 	Var* x = createVariable();
 	x = findVar(table, eStr);
-	return evalFunctHelper(getVarExp(x),table); 
+	Exp* ex = createExpNode();
+	ex = getVarExp(x);
+
+	//if expression function of subsets 
+	char* temp = (char*)malloc(100*sizeof(char));
+	temp = ex->symbol;
+
+	//if "f" or"r"
+	if(strcmp(temp,"f") == 0 || strcmp(temp,"r") == 0){
+		return evalSubsetFunct(x,table);
+	}
+
+	return evalFunctHelper(ex,table); 
 }
+
 
 
 //--------------------------------------------
@@ -165,6 +178,108 @@ long int evaluateFunctHelper2(Exp* curr,char *symb,SymNode* table){
 	}
 }
 
+
+//--------------------------------------------
+// Function: evalSubsetFunct()                                    
+// Purpose: evaluates functions with subsets        
+// Preconditions: Var* of functions with 
+//				  subsets and table
+// Returns: value
+//--------------------------------------------
+long int evalSubsetFunct(Var* ex,SymNode* table){
+	Exp* exp = createExpNode();
+	exp = getVarExp(ex);
+
+	char* temp = (char*)malloc(100*sizeof(char));
+	char* varName = (char*)malloc(100*sizeof(char));
+	varName = evalSubsetFunctHelper(exp,temp);
+
+	//reverse temp
+	reverseString(temp);
+
+
+	//find variable and get its expression
+	Var* x = createVariable();
+	x = findVar(table, varName);
+	exp = getVarExp(x);
+
+
+	//find subsetExp and evaluates 
+	exp = findSubset(exp,temp);
+	return evalFunctHelper(exp,table);
+}
+
+
+
+
+//--------------------------------------------
+// Function: findSubset()                                    
+// Purpose: find subset Exp*       
+// Preconditions: Exp holding subset and
+//		char* of r and f
+// Returns: value
+//--------------------------------------------
+Exp* findSubset(Exp* exp, char* s){
+	Exp* pntr = exp;
+
+	//goes through the list of characters
+	for(int i = 0; i < strlen(s);i = i+2){
+		//if 'f' go to first
+		if(s[i]  == 'f'){
+			if(pntr->first == 0){
+				if(pntr->symbol != 0){
+					return pntr;
+				}
+			}
+			pntr = pntr->first;
+		}
+
+		//if 'r' go to rest
+		if(s[i]  == 'r'){
+			if(pntr->rest == 0){
+				return 0;
+			}
+			pntr = pntr->rest;
+		}
+	}
+	return pntr;
+}
+
+//--------------------------------------------
+// Function: evalSubsetFunctHelper()                                    
+// Purpose: helper for evalSubsetFunct       
+// Preconditions: Exp* of functions with 
+//				  subsets
+// Returns: variable name of Subset
+//--------------------------------------------
+char* evalSubsetFunctHelper(Exp* ex, char* c){
+	Exp* temp = createExpNode();
+	temp = ex;
+
+	//loop through until you find functioname
+	while(temp){
+
+		//takes subset
+		if(temp->symbol){
+		  strcat(c,temp->symbol);
+		}
+
+
+		//if it is the variable name
+		if(temp->rest->symbol){
+			return temp->rest->symbol;
+		}
+
+		//if there is an additional subset symbol
+		if(temp->rest->first){
+			strcat(c," ");
+			temp = temp->rest->first;
+		}
+	}
+}
+
+
+
 //--------------------------------------------
 // Function: appendVar()                                    
 // Purpose: appends Exp in the variable       
@@ -206,3 +321,43 @@ int isString(char* x){
 	}
 	return 0;
 }
+
+
+//--------------------------------------------
+// Function: reverseString()                                    
+// Purpose: reverses a string    
+// Preconditions: x
+// Returns: void
+// Source: geeksforgeeks
+//--------------------------------------------
+void reverseString(char* str) 
+{ 
+    int l, i; 
+    char *begin_ptr, *end_ptr, ch; 
+  
+    // Get the length of the string 
+    l = strlen(str); 
+  
+    // Set the begin_ptr and end_ptr 
+    // initially to start of string 
+    begin_ptr = str; 
+    end_ptr = str; 
+  
+    // Move the end_ptr to the last character 
+    for (i = 0; i < l - 1; i++) 
+        end_ptr++; 
+  
+    // Swap the char from start and end 
+    // index using begin_ptr and end_ptr 
+    for (i = 0; i < l / 2; i++) { 
+  
+        // swap character 
+        ch = *end_ptr; 
+        *end_ptr = *begin_ptr; 
+        *begin_ptr = ch; 
+  
+        // update pointers positions 
+        begin_ptr++; 
+        end_ptr--; 
+    } 
+} 

@@ -16,12 +16,13 @@ extern Var* createE(char *, char *,SymNode*);
 extern long int evalFunction(char*,SymNode*);
 extern void appendVar(Var*, char*);
 extern void printSubsetVF(Var*, char*);
-extern long int evalFunctHelper(Exp*,SymNode*);
-extern long int evaluateFunctFirst(Exp* curr,SymNode*);
-extern long int evaluateFunctHelper2(Exp*,char *,SymNode*);
-extern long int evalSubsetFuct(char*,SymNode*);
-
-
+long int evalFunctHelper(Exp*,SymNode*);
+long int evaluateFunctFirst(Exp* curr,SymNode*);
+long int evaluateFunctHelper2(Exp*,char *,SymNode*);
+long int evalSubsetFunct(Var*,SymNode*);
+char* evalSubsetFunctHelper(Exp*,char *);
+Exp* findSubset(Exp*, char*);
+void reverseString(char* str);
 extern int isString(char*);
 
 
